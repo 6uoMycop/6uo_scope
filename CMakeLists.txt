@@ -11,7 +11,19 @@ endif()
 
 project ("6uo_scope")
 
+# CONFIG
+include(DefineOptions.cmake)
+
+# Зависимости
 find_package(RsVisa REQUIRED)
+add_subdirectory ("deps/inih")  # INI parser library
+
+include_directories(
+  "deps/inih"
+)
+link_directories(
+  "${CMAKE_BINARY_DIR}/deps/inih"
+)
 
 # Включите подпроекты.
 add_subdirectory ("6uo_scope")
