@@ -8,3 +8,5 @@ target_link_libraries(6uo_scope
   rsvisa::rsvisa
   inih
 )
+
+file(COPY "${CMAKE_HOME_DIRECTORY}/misc/plot.py" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

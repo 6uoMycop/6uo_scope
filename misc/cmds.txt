@@ -1,0 +1,13 @@
+Some commands list
+
+Set channel {0,1} measurement scale
+    Write
+:CHANnel{1,2}:SCALe <volts>
+
+Get channel {0,1} measurement scale
+    Query
+:CHANnel1:SCALe?
+
+i) :WAV:SOUR CHAN1
+ii) :WAV:MODE NORM
+ii) :WAV:DATA? and click Send&Read after each – a bunch of data should now appear in the window below

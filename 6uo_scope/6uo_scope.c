@@ -24,7 +24,8 @@ void worker_loop()
 }
 
 
-#define _6UO_BUF_LEN 1024
+#define _6UO_BUF_LEN 1024 * 1024
+static ViChar vi_response[_6UO_BUF_LEN] = { 0 };
 
 int main()
 {
@@ -35,7 +36,6 @@ int main()
 #if 0
     ViFindList vi_list;
 #endif
-    ViChar vi_response[_6UO_BUF_LEN] = {0};
     ViUInt32 vi_ret_cnt;
 
     ViStatus vi_ret = VI_SUCCESS;
@@ -91,12 +91,54 @@ int main()
         goto close_scope;
     }
 
-    ViChar vi_query[] = "*IDN?";
-    vi_ret = viWrite(vi_scope, vi_query, (ViUInt32)strlen(vi_query), VI_NULL);
+
+    ViChar vi_query[][1024] = { "*IDN?", ":WAV:SOUR CHAN2", ":WAV:MODE RAW", ":WAVeform:POINts 1000000000000000000000", ":WAV:DATA?" };
+    vi_ret = viWrite(vi_scope, vi_query[0], (ViUInt32)strlen(vi_query[0]), VI_NULL);
     vi_ret = viRead(vi_scope, vi_response, _6UO_BUF_LEN, &vi_ret_cnt);
     vi_response[vi_ret_cnt] = 0; //terminate the string properly
 
     _6uo_log_printf("Hello, I am %s", vi_response);
+
+    vi_ret = viWrite(vi_scope, vi_query[1], (ViUInt32)strlen(vi_query[1]), VI_NULL);
+    vi_ret |= viWrite(vi_scope, vi_query[2], (ViUInt32)strlen(vi_query[2]), VI_NULL);
+    vi_ret |= viWrite(vi_scope, vi_query[3], (ViUInt32)strlen(vi_query[3]), VI_NULL);
+    vi_ret |= viWrite(vi_scope, vi_query[4], (ViUInt32)strlen(vi_query[4]), VI_NULL);
+    if (vi_ret != VI_SUCCESS)
+    {
+        _6uo_print_error("viWrite() returned %d. Terminating.\n", vi_ret);
+        goto close_scope;
+    }
+    /** Read the output */
+    FILE* f = fopen("test.csv", "w");
+    if (!f)
+    {
+        _6uo_print_error("fopen() error. Terminating.\n");
+        goto close_scope;
+    }
+    fprintf(f, "v\n");
+    while (1)
+    {
+        vi_ret = viRead(vi_scope, vi_response, _6UO_BUF_LEN, &vi_ret_cnt);
+        if (vi_ret == VI_SUCCESS || vi_ret == VI_SUCCESS_MAX_CNT)
+        {
+            for (int i = 0; i < vi_ret_cnt; i++)
+            {
+                fprintf(f, "%d\n", vi_response[i]);
+            }
+            if (vi_ret == VI_SUCCESS)
+            {
+                break;
+            }
+        }
+        else
+        {
+            _6uo_print_error("viRead() returned %d. Terminating.\n", vi_ret);
+            fclose(f);
+            goto close_scope;
+        }
+    }
+    fclose(f);
+
 
 
 close_scope:
