@@ -3,5 +3,5 @@ import plotly.express as px
 
 df = pd.read_csv('test.csv')
 
-fig = px.line(df, x = 't', y = 'V')
+fig = px.line(df, y = 'v')
 fig.show()

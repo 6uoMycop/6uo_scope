@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <Windows.h>
 #include <signal.h>
+#include <time.h> 
 #include <visa.h>
 #include "inih.h"
 
